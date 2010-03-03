@@ -1,7 +1,7 @@
 <?php
 
 	/**
-	 * Elgg notifications plugin index
+	 * Elgg notifications plugin group index
 	 * 
 	 * @package ElggNotifications
 	 * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU Public License version 2
@@ -20,20 +20,23 @@
 		set_context('settings');
 		
 	// Get the form
-		global $SESSION;
+		global $SESSION, $CONFIG;
 		$people = array();
-		if ($people_ents = elgg_get_entities_from_relationship(array('relationship' => 'notify', 'relationship_guid' => $SESSION['user']->guid, 'types' => 'user', 'limit' => 99999))) {
-			foreach($people_ents as $ent)
-				$people[] = $ent->guid;
-		}
-		$body = elgg_view('notifications/subscriptions/form',array(
-							'people' => $people
-						));
+		
+		$groupmemberships = elgg_get_entities_from_relationship(array('relationship' => 'member', 'relationship_guid' => $_SESSION['user']->guid, 'types' => 'group', 'limit' => 9999));
+		
+		$body = elgg_view('input/form',array(
+			'body' => elgg_view('notifications/subscriptions/groupsform',array(
+							'groups' => $groupmemberships
+						)),
+			'method' => 'post',
+			'action' => $CONFIG->wwwroot . 'action/notificationsettings/groupsave'
+		));
 		
 	// Insert it into the correct canvas layout
 		$body = elgg_view_layout('two_column_left_sidebar','',$body);
 		
 	// Draw the page
-		page_draw(elgg_echo('notifications:subscriptions:changesettings'),$body);
+		page_draw(elgg_echo('notifications:subscriptions:changesettings:groups'),$body);
 		
 ?>
